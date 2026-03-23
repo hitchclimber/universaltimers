@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -371,25 +373,56 @@ private fun LabeledSlider(
                 color = accentColor,
             )
         }
-        Slider(
-            value = localPos,
-            onValueChange = {
-                dragging = true
-                localPos = it
-            },
-            onValueChangeFinished = {
-                dragging = false
-                onValueChange(localPos.roundToInt())
-            },
-            valueRange = range,
-            steps = if (discrete) (range.endInclusive - range.start).toInt() - 1 else 0,
-            colors = SliderDefaults.colors(
-                thumbColor = accentColor,
-                activeTrackColor = accentColor,
-                activeTickColor = accentColor,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-        )
+        val min = range.start.toInt()
+        val max = range.endInclusive.toInt()
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(
+                onClick = { if (value > min) onValueChange(value - 1) },
+                enabled = value > min,
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Decrease",
+                    tint = accentColor.copy(alpha = if (value > min) 1f else 0.3f),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+
+            Slider(
+                value = localPos,
+                onValueChange = {
+                    dragging = true
+                    localPos = it
+                },
+                onValueChangeFinished = {
+                    dragging = false
+                    onValueChange(localPos.roundToInt())
+                },
+                valueRange = range,
+                steps = if (discrete) (max - min) - 1 else 0,
+                colors = SliderDefaults.colors(
+                    thumbColor = accentColor,
+                    activeTrackColor = accentColor,
+                    activeTickColor = accentColor,
+                ),
+                modifier = Modifier.weight(1f),
+            )
+
+            IconButton(
+                onClick = { if (value < max) onValueChange(value + 1) },
+                enabled = value < max,
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Increase",
+                    tint = accentColor.copy(alpha = if (value < max) 1f else 0.3f),
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
     }
 }
 
