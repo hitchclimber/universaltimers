@@ -1,17 +1,17 @@
 package io.github.hitchclimber.universaltimers.data
 
 
-val sampleBundles= listOf(
+val sampleBundles = listOf(
     TimerBundle(
         id = "1",
-         name = "DemoHIIT",
+        name = "DemoHIIT",
         blocks = listOf(
             TimerBlock(
                 steps = listOf(
-                    TimerStep(type = StepType.WORK, baseDurationMs = 10_000u),
-                    TimerStep(type = StepType.REST, baseDurationMs = 5_000u)
+                    TimerStep(type = StepType.WORK, baseDurationMs = 10_000),
+                    TimerStep(type = StepType.REST, baseDurationMs = 5_000)
                 ),
-                repetitions = 4u
+                repetitions = 4
             )
         )
     ),
@@ -20,10 +20,11 @@ val sampleBundles= listOf(
         name = "DemoApnea",
         blocks = listOf(
             TimerBlock(
-                steps = listOf(TimerStep(type = StepType.WORK, baseDurationMs = 60_000u),
-                    TimerStep(type = StepType.REST, baseDurationMs = 40u, deltaMs = -5_000)
+                steps = listOf(
+                    TimerStep(type = StepType.WORK, baseDurationMs = 60_000),
+                    TimerStep(type = StepType.REST, baseDurationMs = 40_000, deltaMs = -5_000)
                 ),
-                repetitions = 4u
+                repetitions = 4
             )
         )
     )

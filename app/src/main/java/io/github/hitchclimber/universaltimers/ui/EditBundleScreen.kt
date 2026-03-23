@@ -1,6 +1,8 @@
 package io.github.hitchclimber.universaltimers.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,9 +32,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -40,6 +45,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.hitchclimber.universaltimers.data.StepType
 import io.github.hitchclimber.universaltimers.data.TimerBlock
@@ -60,10 +68,8 @@ fun EditBundleScreen(
         mutableStateOf(
             initial?.blocks ?: listOf(
                 TimerBlock(
-                    steps = listOf(
-                        TimerStep(type = StepType.WORK, baseDurationMs = 30_000u),
-                    ),
-                    repetitions = 1u,
+                    steps = listOf(TimerStep(type = StepType.WORK, baseDurationMs = 30_000)),
+                    repetitions = 1,
                 )
             )
         )
@@ -72,12 +78,15 @@ fun EditBundleScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (initial == null) "New Bundle" else "Edit Bundle") },
+                title = {
+                    Text(if (initial == null) "New Timer" else "Edit Timer")
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
         },
     ) { padding ->
@@ -85,21 +94,22 @@ fun EditBundleScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-            // Bundle name
+            // Name field
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Bundle name") },
+                label = { Text("Timer name") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Blocks
             blocks.forEachIndexed { blockIndex, block ->
                 EditBlockCard(
                     blockIndex = blockIndex,
@@ -119,13 +129,14 @@ fun EditBundleScreen(
             OutlinedButton(
                 onClick = {
                     blocks = blocks + TimerBlock(
-                        steps = listOf(
-                            TimerStep(type = StepType.WORK, baseDurationMs = 30_000u),
-                        ),
-                        repetitions = 1u,
+                        steps = listOf(TimerStep(type = StepType.WORK, baseDurationMs = 30_000)),
+                        repetitions = 1,
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -134,6 +145,7 @@ fun EditBundleScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Save
             Button(
                 onClick = {
                     onSave(
@@ -145,12 +157,16 @@ fun EditBundleScreen(
                     )
                 },
                 enabled = blocks.isNotEmpty() && blocks.all { it.steps.isNotEmpty() },
-                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
             ) {
-                Text("Save")
+                Text("Save", style = MaterialTheme.typography.titleMedium)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -163,19 +179,20 @@ private fun EditBlockCard(
     onBlockChanged: (TimerBlock) -> Unit,
     onDelete: () -> Unit,
 ) {
-    // Determine if there's a REST step
-    val workStep = block.steps.firstOrNull { it.type == StepType.WORK }
-        ?: block.steps.first()
+    val workStep = block.steps.firstOrNull { it.type == StepType.WORK } ?: block.steps.first()
     val restStep = block.steps.firstOrNull { it.type == StepType.REST }
     val hasRest = restStep != null
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             // Header
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -184,64 +201,75 @@ private fun EditBlockCard(
                 Text(
                     text = "Block ${blockIndex + 1}",
                     style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f),
                 )
                 if (canDelete) {
                     IconButton(onClick = onDelete) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete block")
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete block",
+                            tint = MaterialTheme.colorScheme.error,
+                        )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Reps slider (discrete tick marks for countable sets)
-            LabeledSlider(
-                label = "Sets",
-                value = block.repetitions.toInt(),
-                range = 1f..30f,
-                discrete = true,
-                onValueChange = { onBlockChanged(block.copy(repetitions = it.toUShort())) },
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // WORK duration slider
-            LabeledSlider(
-                label = "Work",
-                value = workStep.baseDurationMs.toInt() / 1000,
-                range = 1f..300f,
-                suffix = "s",
-                onValueChange = { sec ->
-                    val newWork = workStep.copy(baseDurationMs = (sec * 1000).toUShort())
-                    onBlockChanged(block.copy(steps = rebuildSteps(newWork, if (hasRest) restStep else null)))
-                },
-            )
-
-            // Work delta
-            DeltaWheel(
-                label = "Work delta",
-                valueSec = workStep.deltaMs.toInt() / 1000,
-                onValueChange = { sec ->
-                    val newWork = workStep.copy(deltaMs = (sec * 1000).toShort())
-                    onBlockChanged(block.copy(steps = rebuildSteps(newWork, if (hasRest) restStep else null)))
-                },
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            // REST toggle
+            // Sets
+            LabeledSlider(
+                label = "Sets",
+                value = block.repetitions,
+                range = 1f..30f,
+                discrete = true,
+                accentColor = MaterialTheme.colorScheme.secondary,
+                onValueChange = { onBlockChanged(block.copy(repetitions = it)) },
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Work section
+            SectionLabel("WORK", MaterialTheme.colorScheme.primary)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LabeledSlider(
+                label = "Duration",
+                value = (workStep.baseDurationMs / 1000).toInt(),
+                range = 1f..300f,
+                suffix = "s",
+                accentColor = MaterialTheme.colorScheme.primary,
+                onValueChange = { sec ->
+                    val newWork = workStep.copy(baseDurationMs = sec.toLong() * 1000)
+                    onBlockChanged(block.copy(steps = rebuildSteps(newWork, if (hasRest) restStep else null)))
+                },
+            )
+
+            DeltaWheel(
+                label = "Delta",
+                valueSec = (workStep.deltaMs / 1000).toInt(),
+                onValueChange = { sec ->
+                    val newWork = workStep.copy(deltaMs = sec.toLong() * 1000)
+                    onBlockChanged(block.copy(steps = rebuildSteps(newWork, if (hasRest) restStep else null)))
+                },
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Rest toggle
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Rest", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                SectionLabel("REST", MaterialTheme.colorScheme.tertiary)
+                Spacer(modifier = Modifier.weight(1f))
                 Switch(
                     checked = hasRest,
                     onCheckedChange = { enabled ->
                         if (enabled) {
-                            val newRest = TimerStep(type = StepType.REST, baseDurationMs = 15_000u)
-                            val newReps = maxOf(2, block.repetitions.toInt()).toUShort()
+                            val newRest = TimerStep(type = StepType.REST, baseDurationMs = 15_000)
+                            val newReps = maxOf(2, block.repetitions)
                             onBlockChanged(block.copy(steps = rebuildSteps(workStep, newRest), repetitions = newReps))
                         } else {
                             onBlockChanged(block.copy(steps = rebuildSteps(workStep, null)))
@@ -250,39 +278,40 @@ private fun EditBlockCard(
                 )
             }
 
-            if (hasRest && restStep != null) {
-                Spacer(modifier = Modifier.height(4.dp))
+            if (hasRest) {
+                Spacer(modifier = Modifier.height(8.dp))
 
                 LabeledSlider(
-                    label = "Rest",
-                    value = restStep.baseDurationMs.toInt() / 1000,
+                    label = "Duration",
+                    value = (restStep.baseDurationMs / 1000).toInt(),
                     range = 1f..300f,
                     suffix = "s",
+                    accentColor = MaterialTheme.colorScheme.tertiary,
                     onValueChange = { sec ->
-                        val newRest = restStep.copy(baseDurationMs = (sec * 1000).toUShort())
+                        val newRest = restStep.copy(baseDurationMs = sec.toLong() * 1000)
                         onBlockChanged(block.copy(steps = rebuildSteps(workStep, newRest)))
                     },
                 )
 
                 DeltaWheel(
-                    label = "Rest delta",
-                    valueSec = restStep.deltaMs.toInt() / 1000,
+                    label = "Delta",
+                    valueSec = (restStep.deltaMs / 1000).toInt(),
                     onValueChange = { sec ->
-                        val newRest = restStep.copy(deltaMs = (sec * 1000).toShort())
+                        val newRest = restStep.copy(deltaMs = sec.toLong() * 1000)
                         onBlockChanged(block.copy(steps = rebuildSteps(workStep, newRest)))
                     },
                 )
 
-                // Min rest (only show if delta is negative)
                 if (restStep.deltaMs < 0) {
                     Spacer(modifier = Modifier.height(4.dp))
                     LabeledSlider(
-                        label = "Min rest",
-                        value = restStep.minMs.toInt() / 1000,
-                        range = 0f..((restStep.baseDurationMs.toInt() / 1000).toFloat()),
+                        label = "Min",
+                        value = (restStep.minMs / 1000).toInt(),
+                        range = 0f..((restStep.baseDurationMs / 1000).toFloat()),
                         suffix = "s",
+                        accentColor = MaterialTheme.colorScheme.tertiary,
                         onValueChange = { sec ->
-                            val newRest = restStep.copy(minMs = (sec * 1000).toUShort())
+                            val newRest = restStep.copy(minMs = sec.toLong() * 1000)
                             onBlockChanged(block.copy(steps = rebuildSteps(workStep, newRest)))
                         },
                     )
@@ -292,10 +321,23 @@ private fun EditBlockCard(
     }
 }
 
-/**
- * Slider with a label on the left and current value on the right.
- * @param discrete If true, shows tick marks (good for small ranges like sets 1-30).
- */
+@Composable
+private fun SectionLabel(text: String, color: Color) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(color.copy(alpha = 0.12f))
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            color = color,
+        )
+    }
+}
+
 @Composable
 private fun LabeledSlider(
     label: String,
@@ -303,24 +345,32 @@ private fun LabeledSlider(
     range: ClosedFloatingPointRange<Float>,
     suffix: String = "",
     discrete: Boolean = false,
+    accentColor: Color = MaterialTheme.colorScheme.primary,
     onValueChange: (Int) -> Unit,
 ) {
     var dragging by remember { mutableStateOf(false) }
     var localPos by remember { mutableFloatStateOf(value.toFloat()) }
-    // Sync from parent when not dragging
     if (!dragging) {
         localPos = value.toFloat()
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.width(72.dp),
-        )
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = "${localPos.roundToInt()}$suffix",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = accentColor,
+            )
+        }
         Slider(
             value = localPos,
             onValueChange = {
@@ -333,20 +383,16 @@ private fun LabeledSlider(
             },
             valueRange = range,
             steps = if (discrete) (range.endInclusive - range.start).toInt() - 1 else 0,
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            text = "${localPos.roundToInt()}$suffix",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.width(52.dp),
+            colors = SliderDefaults.colors(
+                thumbColor = accentColor,
+                activeTrackColor = accentColor,
+                activeTickColor = accentColor,
+            ),
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
-/**
- * Vertical wheel-style control for delta values.
- * Up arrow = decrease (more negative), Down arrow = increase (more positive).
- */
 @Composable
 private fun DeltaWheel(
     label: String,
@@ -357,7 +403,7 @@ private fun DeltaWheel(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 72.dp),
+            .padding(vertical = 4.dp),
     ) {
         Text(
             text = label,
@@ -366,38 +412,43 @@ private fun DeltaWheel(
             modifier = Modifier.weight(1f),
         )
 
-        // Up = more negative (less time per rep)
         IconButton(
             onClick = { onValueChange(valueSec - 1) },
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(36.dp),
         ) {
             Icon(
                 Icons.Default.KeyboardArrowUp,
-                contentDescription = "Decrease delta",
+                contentDescription = "Decrease",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
-        Text(
-            text = if (valueSec == 0) "0s" else "${if (valueSec > 0) "+" else ""}${valueSec}s",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.width(48.dp),
-        )
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = if (valueSec == 0) "0s" else "${if (valueSec > 0) "+" else ""}${valueSec}s",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+            )
+        }
 
-        // Down = more positive (more time per rep)
         IconButton(
             onClick = { onValueChange(valueSec + 1) },
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(36.dp),
         ) {
             Icon(
                 Icons.Default.KeyboardArrowDown,
-                contentDescription = "Increase delta",
+                contentDescription = "Increase",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
 }
 
-/** Rebuild step list as [WORK, REST?] */
 private fun rebuildSteps(work: TimerStep, rest: TimerStep?): List<TimerStep> =
     if (rest != null) listOf(work, rest) else listOf(work)

@@ -3,63 +3,17 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Stopwatch body (circle) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,62m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
-
-    <!-- Inner circle (face) -->
-    <path
-        android:fillColor="#1e1e2e"
-        android:pathData="M54,62m-18,0a18,18 0,1 1,36 0a18,18 0,1 1,-36 0" />
-
-    <!-- Minute hand -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:strokeWidth="0"
-        android:pathData="M53,62L53,47L55,47L55,62Z" />
-
-    <!-- Second hand -->
-    <path
-        android:fillColor="#89b4fa"
-        android:strokeWidth="0"
-        android:pathData="M54,62L65,55L65.8,56.4L54.8,63.4Z" />
-
-    <!-- Center dot -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,62m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0" />
-
-    <!-- Crown/button (top) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M51.5,36L56.5,36L56.5,41L51.5,41Z" />
-
-    <!-- Crown knob -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M52.5,33L55.5,33L55.5,36.5L52.5,36.5Z" />
-
-    <!-- Right lug -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M68,42L73,37"
-        android:strokeWidth="3"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-
-    <!-- Tick marks -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M53.5,44.5L54.5,44.5L54.5,47.5L53.5,47.5Z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M53.5,76.5L54.5,76.5L54.5,79.5L53.5,79.5Z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M36,61.5L36,62.5L33,62.5L33,61.5Z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M72,61.5L72,62.5L75,62.5L75,61.5Z" />
+    <!-- Scaled and centered baseline_timer_24 (3x scale, offset to center in 108x108 safe zone) -->
+    <group
+        android:translateX="18"
+        android:translateY="18"
+        android:scaleX="3"
+        android:scaleY="3">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M9,1h6v2h-6z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M19.03,7.39l1.42,-1.42c-0.43,-0.51 -0.9,-0.99 -1.41,-1.41l-1.42,1.42C16.07,4.74 14.12,4 12,4c-4.97,0 -9,4.03 -9,9c0,4.97 4.02,9 9,9s9,-4.03 9,-9C21,10.88 20.26,8.93 19.03,7.39zM13,14h-2V8h2V14z" />
+    </group>
 </vector>

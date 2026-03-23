@@ -64,7 +64,7 @@ class TimerEngine {
 
         job = scope.launch {
             for ((blockIndex, block) in bundle.blocks.withIndex()) {
-                for (rep in 0 until block.repetitions.toInt()) {
+                for (rep in 0 until block.repetitions) {
                     for ((stepIndex, step) in block.steps.withIndex()) {
                         val durationMs = computeDuration(step, rep)
 
@@ -118,11 +118,10 @@ class TimerEngine {
      * Applies delta per repetition, clamped to minMs.
      */
     private fun computeDuration(step: TimerStep, repetition: Int): Long {
-        val base = step.baseDurationMs.toLong()
-        val delta = step.deltaMs.toLong() * repetition
+        val base = step.baseDurationMs
+        val delta = step.deltaMs * repetition
         val computed = base + delta
-        val min = step.minMs.toLong()
-        return maxOf(computed, min)
+        return maxOf(computed, step.minMs)
     }
 
     /**

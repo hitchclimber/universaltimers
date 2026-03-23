@@ -12,15 +12,15 @@ enum class StepType {
 data class TimerStep (
     val label: String = "",
     val type: StepType,
-    val baseDurationMs: UShort,
-    val deltaMs: Short = 0,
-    val minMs: UShort = 0u,
+    val baseDurationMs: Long,
+    val deltaMs: Long = 0,
+    val minMs: Long = 0,
 )
 
 @Serializable
 data class TimerBlock(
     val steps: List<TimerStep>,
-    val repetitions: UShort
+    val repetitions: Int
 )
 
 data class TimerBundle(

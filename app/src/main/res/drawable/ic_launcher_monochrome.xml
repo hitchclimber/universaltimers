@@ -3,27 +3,16 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Stopwatch body -->
-    <path
-        android:fillColor="#000000"
-        android:pathData="M54,62m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
-
-    <!-- Crown button -->
-    <path
-        android:fillColor="#000000"
-        android:pathData="M51.5,36L56.5,36L56.5,41L51.5,41Z" />
-
-    <!-- Crown knob -->
-    <path
-        android:fillColor="#000000"
-        android:pathData="M52.5,33L55.5,33L55.5,36.5L52.5,36.5Z" />
-
-    <!-- Right lug -->
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M68,42L73,37"
-        android:strokeWidth="3"
-        android:strokeColor="#000000"
-        android:strokeLineCap="round" />
+    <group
+        android:translateX="18"
+        android:translateY="18"
+        android:scaleX="3"
+        android:scaleY="3">
+        <path
+            android:fillColor="#000000"
+            android:pathData="M9,1h6v2h-6z" />
+        <path
+            android:fillColor="#000000"
+            android:pathData="M19.03,7.39l1.42,-1.42c-0.43,-0.51 -0.9,-0.99 -1.41,-1.41l-1.42,1.42C16.07,4.74 14.12,4 12,4c-4.97,0 -9,4.03 -9,9c0,4.97 4.02,9 9,9s9,-4.03 9,-9C21,10.88 20.26,8.93 19.03,7.39zM13,14h-2V8h2V14z" />
+    </group>
 </vector>
