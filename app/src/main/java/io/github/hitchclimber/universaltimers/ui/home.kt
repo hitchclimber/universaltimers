@@ -202,7 +202,7 @@ private fun BundleCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val totalMs = computeBundleTotalMs(bundle)
-                val totalSteps = bundle.blocks.sumOf { it.steps.size * it.repetitions }
+                bundle.blocks.sumOf { it.steps.size * it.repetitions }
                 val totalSets = bundle.blocks.sumOf { it.repetitions }
 
                 InfoChip(
