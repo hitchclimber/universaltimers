@@ -1,0 +1,1 @@
+Flexible interval timers for sports training with dynamic duration control
