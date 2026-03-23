@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Stopwatch body -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M54,62m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
+
+    <!-- Crown button -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M51.5,36L56.5,36L56.5,41L51.5,41Z" />
+
+    <!-- Crown knob -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M52.5,33L55.5,33L55.5,36.5L52.5,36.5Z" />
+
+    <!-- Right lug -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M68,42L73,37"
+        android:strokeWidth="3"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round" />
+</vector>

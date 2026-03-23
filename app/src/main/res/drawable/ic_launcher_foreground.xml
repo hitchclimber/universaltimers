@@ -1,0 +1,65 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Stopwatch body (circle) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,62m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0" />
+
+    <!-- Inner circle (face) -->
+    <path
+        android:fillColor="#1e1e2e"
+        android:pathData="M54,62m-18,0a18,18 0,1 1,36 0a18,18 0,1 1,-36 0" />
+
+    <!-- Minute hand -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0"
+        android:pathData="M53,62L53,47L55,47L55,62Z" />
+
+    <!-- Second hand -->
+    <path
+        android:fillColor="#89b4fa"
+        android:strokeWidth="0"
+        android:pathData="M54,62L65,55L65.8,56.4L54.8,63.4Z" />
+
+    <!-- Center dot -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,62m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0" />
+
+    <!-- Crown/button (top) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M51.5,36L56.5,36L56.5,41L51.5,41Z" />
+
+    <!-- Crown knob -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M52.5,33L55.5,33L55.5,36.5L52.5,36.5Z" />
+
+    <!-- Right lug -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,42L73,37"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- Tick marks -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M53.5,44.5L54.5,44.5L54.5,47.5L53.5,47.5Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M53.5,76.5L54.5,76.5L54.5,79.5L53.5,79.5Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,61.5L36,62.5L33,62.5L33,61.5Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M72,61.5L72,62.5L75,62.5L75,61.5Z" />
+</vector>
