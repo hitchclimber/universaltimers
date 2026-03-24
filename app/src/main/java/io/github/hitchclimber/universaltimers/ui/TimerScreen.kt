@@ -1,7 +1,6 @@
 package io.github.hitchclimber.universaltimers.ui
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -37,6 +36,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -205,6 +207,23 @@ private fun RunningView(
 
     Spacer(modifier = Modifier.height(16.dp))
 
+    // Track the previous step's type so the circle retains its color
+    val defaultTrack = MaterialTheme.colorScheme.surfaceContainerHighest
+    val stepKey = Triple(state.currentBlockIndex, state.currentRepetition, state.currentStepIndex)
+    var prevStepType by remember { mutableStateOf<StepType?>(null) }
+    var rememberedType by remember { mutableStateOf(state.currentStepType) }
+    var lastStepKey by remember { mutableStateOf(stepKey) }
+    if (stepKey != lastStepKey) {
+        prevStepType = rememberedType   // old step's type → track
+        rememberedType = state.currentStepType
+        lastStepKey = stepKey
+    }
+    val trackColor = if (prevStepType != null) stepTypeColor(prevStepType!!) else defaultTrack
+
+    // Progress: compute directly (no animation) to avoid snap-back on step change
+    val progress = if (state.totalStepMs > 0)
+        1f - (state.remainingMs.toFloat() / state.totalStepMs) else 0f
+
     // Circular progress + countdown
     Box(
         contentAlignment = Alignment.Center,
@@ -213,21 +232,12 @@ private fun RunningView(
             .fillMaxWidth()
             .aspectRatio(1f),
     ) {
-        val progress by animateFloatAsState(
-            targetValue = if (state.totalStepMs > 0)
-                1f - (state.remainingMs.toFloat() / state.totalStepMs) else 0f,
-            animationSpec = tween(150),
-            label = "progress",
-        )
-
-        val trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
-
         Canvas(modifier = Modifier.fillMaxSize()) {
             val strokeWidth = 12.dp.toPx()
             val arcSize = Size(size.width - strokeWidth, size.height - strokeWidth)
             val arcOffset = Offset(strokeWidth / 2, strokeWidth / 2)
 
-            // Track
+            // Track – retains previous step's color
             drawArc(
                 color = trackColor,
                 startAngle = -90f,
@@ -237,7 +247,7 @@ private fun RunningView(
                 size = arcSize,
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
             )
-            // Progress
+            // Progress – current step fills over the track
             drawArc(
                 color = stepColor,
                 startAngle = -90f,
