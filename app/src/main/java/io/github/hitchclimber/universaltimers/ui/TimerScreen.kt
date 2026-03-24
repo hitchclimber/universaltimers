@@ -100,7 +100,7 @@ fun TimerScreen(
                 verticalArrangement = Arrangement.Center,
             ) {
                 if (state.isFinished) {
-                    FinishedView(onBack = onBack)
+                    FinishedView(onReset = onStop)
                 } else if (state.isRunning) {
                     RunningView(
                         state = state,
