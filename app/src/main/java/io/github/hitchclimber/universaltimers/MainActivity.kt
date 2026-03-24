@@ -2,6 +2,7 @@ package io.github.hitchclimber.universaltimers
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.core.content.edit
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.collectAsState
@@ -29,10 +30,20 @@ class MainActivity : ComponentActivity() {
 
         val db = AppDatabase.getInstance(this)
         val repo = BundleRepository(db.bundleDao())
+        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
 
         setContent {
             val systemDark = isSystemInDarkTheme()
-            var darkOverride by remember { mutableStateOf<Boolean?>(null) }
+            val savedDark = prefs.getString("dark_mode", null)
+            var darkOverride by remember {
+                mutableStateOf(
+                    when (savedDark) {
+                        "true" -> true
+                        "false" -> false
+                        else -> null
+                    }
+                )
+            }
             val isDark = darkOverride ?: systemDark
 
             CatppuccinTheme(darkTheme = isDark) {
@@ -49,7 +60,11 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(
                             bundles = bundles,
                             isDark = isDark,
-                            onToggleTheme = { darkOverride = !isDark },
+                            onToggleTheme = {
+                                val newDark = !isDark
+                                darkOverride = newDark
+                                prefs.edit { putString("dark_mode", newDark.toString()) }
+                            },
                             onBundleClick = {
                                 selectedBundle = it
                                 screen = Screen.TIMER
