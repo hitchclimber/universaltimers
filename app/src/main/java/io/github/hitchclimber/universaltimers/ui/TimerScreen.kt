@@ -446,9 +446,15 @@ private fun stepTypeColor(type: StepType) =
 
 private fun computeTotalMs(bundle: TimerBundle): Long {
     var total = 0L
-    for (block in bundle.blocks) {
+    for ((blockIndex, block) in bundle.blocks.withIndex()) {
         for (rep in 0 until block.repetitions) {
-            for (step in block.steps) {
+            for ((stepIndex, step) in block.steps.withIndex()) {
+                // Skip final REST of last rep unless another block follows
+                if (step.type == StepType.REST
+                    && stepIndex == block.steps.lastIndex
+                    && rep == block.repetitions - 1
+                    && blockIndex == bundle.blocks.lastIndex
+                ) continue
                 total += maxOf(step.baseDurationMs + step.deltaMs * rep, step.minMs)
             }
         }
