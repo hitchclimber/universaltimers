@@ -313,7 +313,7 @@ private fun RunningView(
 }
 
 @Composable
-private fun FinishedView(onBack: () -> Unit) {
+private fun FinishedView(onReset: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "Done!",
@@ -323,10 +323,14 @@ private fun FinishedView(onBack: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(24.dp))
         FilledIconButton(
-            onClick = onBack,
+            onClick = onReset,
             modifier = Modifier.size(64.dp),
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            Icon(
+                painterResource(R.drawable.ic_reset),
+                contentDescription = "Reset",
+                modifier = Modifier.size(28.dp),
+            )
         }
     }
 }
