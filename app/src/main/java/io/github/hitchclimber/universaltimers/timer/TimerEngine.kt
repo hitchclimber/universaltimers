@@ -67,13 +67,12 @@ class TimerEngine {
             for ((blockIndex, block) in bundle.blocks.withIndex()) {
                 for (rep in 0 until block.repetitions) {
                     for ((stepIndex, step) in block.steps.withIndex()) {
-                        // Skip the final REST step if no more work follows
-                        val isLastStep = stepIndex == block.steps.lastIndex
-                        val isLastRep = rep == block.repetitions - 1
-                        val isLastBlock = blockIndex == bundle.blocks.lastIndex
-                        if (step.type == StepType.REST && isLastStep && isLastRep && isLastBlock) {
-                            continue
-                        }
+                        // Skip REST after the last rep unless another block follows
+                        if (step.type == StepType.REST
+                            && stepIndex == block.steps.lastIndex
+                            && rep == block.repetitions - 1
+                            && blockIndex == bundle.blocks.lastIndex
+                        ) continue
 
                         val durationMs = computeDuration(step, rep)
 
