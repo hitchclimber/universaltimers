@@ -1,5 +1,6 @@
 package io.github.hitchclimber.universaltimers.timer
 
+import io.github.hitchclimber.universaltimers.data.StepType
 import io.github.hitchclimber.universaltimers.data.TimerBundle
 import io.github.hitchclimber.universaltimers.data.TimerStep
 import kotlinx.coroutines.CoroutineScope
@@ -66,6 +67,14 @@ class TimerEngine {
             for ((blockIndex, block) in bundle.blocks.withIndex()) {
                 for (rep in 0 until block.repetitions) {
                     for ((stepIndex, step) in block.steps.withIndex()) {
+                        // Skip the final REST step if no more work follows
+                        val isLastStep = stepIndex == block.steps.lastIndex
+                        val isLastRep = rep == block.repetitions - 1
+                        val isLastBlock = blockIndex == bundle.blocks.lastIndex
+                        if (step.type == StepType.REST && isLastStep && isLastRep && isLastBlock) {
+                            continue
+                        }
+
                         val durationMs = computeDuration(step, rep)
 
                         val baseState = TimerState(
