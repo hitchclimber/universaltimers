@@ -28,7 +28,7 @@ data class TimerState(
     /** Label of the current step */
     val currentStepLabel: String = "",
     /** Type of the current step (WORK/REST) */
-    val currentStepType: io.github.hitchclimber.universaltimers.data.StepType = io.github.hitchclimber.universaltimers.data.StepType.WORK,
+    val currentStepType: StepType = StepType.WORK,
     /** Remaining time for the current step in milliseconds */
     val remainingMs: Long = 0L,
     /** Total duration of the current step in milliseconds (after delta applied) */
