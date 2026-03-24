@@ -279,7 +279,7 @@ private fun RunningView(
         // Stop
         FilledTonalIconButton(
             onClick = onStop,
-            modifier = Modifier.size(56.dp),
+            modifier = Modifier.size(60.dp),
             colors = IconButtonDefaults.filledTonalIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.errorContainer,
                 contentColor = MaterialTheme.colorScheme.onErrorContainer,
@@ -288,14 +288,14 @@ private fun RunningView(
             Icon(
                 painterResource(R.drawable.ic_stop),
                 contentDescription = "Stop",
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(26.dp),
             )
         }
 
         // Pause/Resume
         FilledIconButton(
             onClick = onPauseResume,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(72.dp),
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = stepColor,
                 contentColor = MaterialTheme.colorScheme.surface,
@@ -306,7 +306,7 @@ private fun RunningView(
                     if (state.isPaused) R.drawable.ic_play else R.drawable.ic_pause
                 ),
                 contentDescription = if (state.isPaused) "Resume" else "Pause",
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier.size(32.dp),
             )
         }
     }
