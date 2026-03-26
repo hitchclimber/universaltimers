@@ -70,6 +70,8 @@ import io.github.hitchclimber.universaltimers.timer.TimerState
 fun TimerScreen(
     bundle: TimerBundle,
     state: TimerState,
+    isSoundEnabled: Boolean,
+    onToggleSound: () -> Unit,
     onStart: () -> Unit,
     onPauseResume: () -> Unit,
     onStop: () -> Unit,
@@ -122,7 +124,12 @@ fun TimerScreen(
                         onStop = onStop,
                     )
                 } else {
-                    IdleView(bundle = bundle, onStart = onStart)
+                    IdleView(
+                        bundle = bundle,
+                        isSoundEnabled = isSoundEnabled,
+                        onToggleSound = onToggleSound,
+                        onStart = onStart,
+                    )
                 }
             }
 
@@ -146,7 +153,12 @@ fun TimerScreen(
 }
 
 @Composable
-private fun IdleView(bundle: TimerBundle, onStart: () -> Unit) {
+private fun IdleView(
+    bundle: TimerBundle,
+    isSoundEnabled: Boolean,
+    onToggleSound: () -> Unit,
+    onStart: () -> Unit,
+) {
     val totalMs = computeTotalMs(bundle)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -162,7 +174,23 @@ private fun IdleView(bundle: TimerBundle, onStart: () -> Unit) {
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.outline,
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Sound toggle
+        IconButton(onClick = onToggleSound) {
+            Icon(
+                painterResource(
+                    if (isSoundEnabled) R.drawable.ic_volume_on else R.drawable.ic_volume_off
+                ),
+                contentDescription = if (isSoundEnabled) "Sound on" else "Sound off",
+                tint = if (isSoundEnabled)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.outline,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         FilledIconButton(
             onClick = onStart,
