@@ -1,46 +1,45 @@
 package io.github.hitchclimber.universaltimers.timer
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.hitchclimber.universaltimers.data.TimerBundle
-import kotlinx.coroutines.flow.MutableStateFlow
+import io.github.hitchclimber.universaltimers.service.TimerService
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * ViewModel that bridges the [TimerEngine] with the UI.
+ * ViewModel that bridges the shared [TimerEngineHolder] with the UI
+ * and manages the foreground [TimerService] lifecycle.
  */
-class TimerViewModel : ViewModel() {
+class TimerViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val engine = TimerEngine()
-
-    private val _state = MutableStateFlow(TimerState())
-    val state: StateFlow<TimerState> = _state.asStateFlow()
+    val state: StateFlow<TimerState> = TimerEngineHolder.state
 
     fun startBundle(bundle: TimerBundle) {
-        engine.start(
+        val context = getApplication<Application>()
+        TimerEngineHolder.start(
             scope = viewModelScope,
             bundle = bundle,
-            onTick = { _state.value = it },
-            onFinished = { /* state already set to isFinished by engine */ },
+            onFinished = {
+                // Service observes isFinished and handles its own shutdown
+            },
         )
+        TimerService.startService(context)
     }
 
     fun togglePause() {
-        if (_state.value.isPaused) {
-            engine.resume()
-        } else {
-            engine.pause()
-        }
+        TimerEngineHolder.togglePause()
     }
 
     fun stop() {
-        engine.stop()
-        _state.value = TimerState()
+        val context = getApplication<Application>()
+        TimerEngineHolder.stop()
+        TimerService.stopService(context)
     }
 
     override fun onCleared() {
         super.onCleared()
-        engine.stop()
+        // Don't stop the engine here -- the service keeps it alive
+        // when the activity is destroyed but timer is still running.
     }
 }
