@@ -1,7 +1,15 @@
 package io.github.hitchclimber.universaltimers.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -103,6 +111,8 @@ fun TimerScreen(
             ) {
                 if (state.isFinished) {
                     FinishedView(onReset = onStop)
+                } else if (state.isCountingDown) {
+                    CountdownView(value = state.countdownValue)
                 } else if (state.isRunning) {
                     RunningView(
                         state = state,
@@ -307,6 +317,44 @@ private fun RunningView(
                 ),
                 contentDescription = if (state.isPaused) "Resume" else "Pause",
                 modifier = Modifier.size(32.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun CountdownView(value: Int) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .padding(horizontal = 48.dp),
+    ) {
+        AnimatedContent(
+            targetState = value,
+            transitionSpec = {
+                (scaleIn(
+                    initialScale = 0.4f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow,
+                    ),
+                ) + fadeIn(animationSpec = tween(200)))
+                    .togetherWith(
+                        scaleOut(
+                            targetScale = 1.6f,
+                            animationSpec = tween(250),
+                        ) + fadeOut(animationSpec = tween(200))
+                    )
+            },
+            label = "countdown-number",
+        ) { targetValue ->
+            Text(
+                text = "$targetValue",
+                fontSize = 120.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }

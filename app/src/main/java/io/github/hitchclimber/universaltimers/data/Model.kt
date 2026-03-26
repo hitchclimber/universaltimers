@@ -26,5 +26,6 @@ data class TimerBlock(
 data class TimerBundle(
     val id: String,
     val name: String,
-    val blocks: List<TimerBlock>
+    val blocks: List<TimerBlock>,
+    val countdownEnabled: Boolean = false,
 )

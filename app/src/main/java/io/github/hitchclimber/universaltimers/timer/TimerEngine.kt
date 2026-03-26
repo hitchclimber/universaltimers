@@ -19,6 +19,10 @@ data class TimerState(
     val isRunning: Boolean = false,
     val isPaused: Boolean = false,
     val isFinished: Boolean = false,
+    /** True while the 3-2-1 countdown is active (before the first step starts) */
+    val isCountingDown: Boolean = false,
+    /** Current countdown number displayed (3, 2, or 1) */
+    val countdownValue: Int = 0,
     /** Index of the current block within the bundle */
     val currentBlockIndex: Int = 0,
     /** Current repetition within the current block (0-based) */
@@ -64,6 +68,14 @@ class TimerEngine {
         paused = false
 
         job = scope.launch {
+            // Countdown phase (3-2-1) when enabled
+            if (bundle.countdownEnabled) {
+                for (value in 3 downTo 1) {
+                    onTick(TimerState(isCountingDown = true, countdownValue = value))
+                    delay(1000L)
+                }
+            }
+
             for ((blockIndex, block) in bundle.blocks.withIndex()) {
                 for (rep in 0 until block.repetitions) {
                     for ((stepIndex, step) in block.steps.withIndex()) {

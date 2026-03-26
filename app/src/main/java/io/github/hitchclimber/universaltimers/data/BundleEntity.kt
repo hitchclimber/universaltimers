@@ -12,4 +12,5 @@ data class BundleEntity(
     val name: String,
     /** JSON-serialized List<TimerBlock> */
     val blocksJson: String,
+    val countdownEnabled: Boolean = false,
 )
