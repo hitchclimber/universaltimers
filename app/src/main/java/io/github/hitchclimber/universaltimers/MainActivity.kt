@@ -46,10 +46,18 @@ class MainActivity : ComponentActivity() {
             }
             val isDark = darkOverride ?: systemDark
 
+            // Sound preference (default: ON)
+            var soundEnabled by remember {
+                mutableStateOf(prefs.getBoolean("sound_enabled", true))
+            }
+
             CatppuccinTheme(darkTheme = isDark) {
                 val timerVm: TimerViewModel = viewModel()
                 val timerState by timerVm.state.collectAsState()
                 val scope = rememberCoroutineScope()
+
+                // Keep SoundManager in sync with the preference
+                timerVm.soundManager.enabled = soundEnabled
 
                 val bundles by repo.observeAll().collectAsState(initial = emptyList())
                 var selectedBundle by remember { mutableStateOf<TimerBundle?>(null) }
@@ -82,6 +90,12 @@ class MainActivity : ComponentActivity() {
                         TimerScreen(
                             bundle = bundle,
                             state = timerState,
+                            isSoundEnabled = soundEnabled,
+                            onToggleSound = {
+                                val newValue = !soundEnabled
+                                soundEnabled = newValue
+                                prefs.edit { putBoolean("sound_enabled", newValue) }
+                            },
                             onStart = { timerVm.startBundle(bundle) },
                             onPauseResume = { timerVm.togglePause() },
                             onStop = { timerVm.stop() },
