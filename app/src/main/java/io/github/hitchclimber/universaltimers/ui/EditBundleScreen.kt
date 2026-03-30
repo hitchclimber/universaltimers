@@ -249,7 +249,21 @@ private fun EditBlockCard(
                 range = 1f..30f,
                 discrete = true,
                 accentColor = MaterialTheme.colorScheme.secondary,
-                onValueChange = { onBlockChanged(block.copy(repetitions = it)) },
+                onValueChange = { newReps ->
+                    val newBlock = when {
+                        newReps > 1 && !hasRest -> {
+                            // Auto-enable REST when sets > 1
+                            val newRest = TimerStep(type = StepType.REST, baseDurationMs = 15_000)
+                            block.copy(steps = rebuildSteps(workStep, newRest), repetitions = newReps)
+                        }
+                        newReps == 1 && hasRest -> {
+                            // Auto-disable REST when back to 1 set
+                            block.copy(steps = rebuildSteps(workStep, null), repetitions = newReps)
+                        }
+                        else -> block.copy(repetitions = newReps)
+                    }
+                    onBlockChanged(newBlock)
+                },
             )
 
             Spacer(modifier = Modifier.height(20.dp))
