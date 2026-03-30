@@ -1,34 +1,30 @@
 package io.github.hitchclimber.universaltimers.timer
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.hitchclimber.universaltimers.data.TimerBundle
-import kotlinx.coroutines.flow.MutableStateFlow
+import io.github.hitchclimber.universaltimers.service.TimerService
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 /**
- * ViewModel that bridges the [TimerEngine] with the UI.
+ * ViewModel that bridges the shared [TimerEngineHolder] with the UI
+ * and manages the foreground [TimerService] lifecycle.
  */
-class TimerViewModel : ViewModel() {
+class TimerViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val engine = TimerEngine()
     val soundManager = SoundManager()
 
-    private val _state = MutableStateFlow(TimerState())
-    val state: StateFlow<TimerState> = _state.asStateFlow()
+    val state: StateFlow<TimerState> = TimerEngineHolder.state
 
     /** Tracks the previous step key so we can detect step transitions. */
     private var lastStepKey: Triple<Int, Int, Int>? = null
 
-    fun startBundle(bundle: TimerBundle) {
-        lastStepKey = null
-        soundManager.playStart(viewModelScope)
-
-        engine.start(
-            scope = viewModelScope,
-            bundle = bundle,
-            onTick = { newState ->
+    init {
+        // Observe state to play sounds on step transitions
+        viewModelScope.launch {
+            state.collect { newState ->
                 if (newState.isRunning && !newState.isFinished) {
                     val key = Triple(
                         newState.currentBlockIndex,
@@ -40,31 +36,40 @@ class TimerViewModel : ViewModel() {
                     }
                     lastStepKey = key
                 }
-                _state.value = newState
-            },
+            }
+        }
+    }
+
+    fun startBundle(bundle: TimerBundle) {
+        val context = getApplication<Application>()
+        lastStepKey = null
+        soundManager.playStart(viewModelScope)
+
+        TimerEngineHolder.start(
+            scope = viewModelScope,
+            bundle = bundle,
             onFinished = {
                 soundManager.playFinished(viewModelScope)
             },
         )
+        TimerService.startService(context)
     }
 
     fun togglePause() {
-        if (_state.value.isPaused) {
-            engine.resume()
-        } else {
-            engine.pause()
-        }
+        TimerEngineHolder.togglePause()
     }
 
     fun stop() {
-        engine.stop()
-        _state.value = TimerState()
+        val context = getApplication<Application>()
+        TimerEngineHolder.stop()
+        TimerService.stopService(context)
         lastStepKey = null
     }
 
     override fun onCleared() {
         super.onCleared()
-        engine.stop()
+        // Don't stop the engine here -- the service keeps it alive
+        // when the activity is destroyed but timer is still running.
         soundManager.release()
     }
 }
