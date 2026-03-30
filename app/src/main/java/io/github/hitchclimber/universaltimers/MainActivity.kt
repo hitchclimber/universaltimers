@@ -64,6 +64,11 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(prefs.getBoolean("sound_enabled", true))
             }
 
+            // Keep-screen-on preference (default: OFF)
+            var keepScreenOn by remember {
+                mutableStateOf(prefs.getBoolean("keep_screen_on", false))
+            }
+
             CatppuccinTheme(darkTheme = isDark) {
                 val timerVm: TimerViewModel = viewModel()
                 val timerState by timerVm.state.collectAsState()
@@ -104,10 +109,16 @@ class MainActivity : ComponentActivity() {
                             bundle = bundle,
                             state = timerState,
                             isSoundEnabled = soundEnabled,
+                            isKeepScreenOn = keepScreenOn,
                             onToggleSound = {
                                 val newValue = !soundEnabled
                                 soundEnabled = newValue
                                 prefs.edit { putBoolean("sound_enabled", newValue) }
+                            },
+                            onToggleKeepScreenOn = {
+                                val newValue = !keepScreenOn
+                                keepScreenOn = newValue
+                                prefs.edit { putBoolean("keep_screen_on", newValue) }
                             },
                             onStart = { timerVm.startBundle(bundle) },
                             onPauseResume = { timerVm.togglePause() },

@@ -43,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +56,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -71,7 +73,9 @@ fun TimerScreen(
     bundle: TimerBundle,
     state: TimerState,
     isSoundEnabled: Boolean,
+    isKeepScreenOn: Boolean,
     onToggleSound: () -> Unit,
+    onToggleKeepScreenOn: () -> Unit,
     onStart: () -> Unit,
     onPauseResume: () -> Unit,
     onStop: () -> Unit,
@@ -82,6 +86,15 @@ fun TimerScreen(
         animationSpec = tween(300),
         label = "step-color",
     )
+
+    // Keep screen on while the timer is active (only when the user opted in)
+    val view = LocalView.current
+    val shouldKeepOn = isKeepScreenOn &&
+            (state.isRunning || state.isPaused || state.isCountingDown)
+    DisposableEffect(shouldKeepOn) {
+        view.keepScreenOn = shouldKeepOn
+        onDispose { view.keepScreenOn = false }
+    }
 
     Scaffold(
         topBar = {
@@ -127,7 +140,9 @@ fun TimerScreen(
                     IdleView(
                         bundle = bundle,
                         isSoundEnabled = isSoundEnabled,
+                        isKeepScreenOn = isKeepScreenOn,
                         onToggleSound = onToggleSound,
+                        onToggleKeepScreenOn = onToggleKeepScreenOn,
                         onStart = onStart,
                     )
                 }
@@ -156,7 +171,9 @@ fun TimerScreen(
 private fun IdleView(
     bundle: TimerBundle,
     isSoundEnabled: Boolean,
+    isKeepScreenOn: Boolean,
     onToggleSound: () -> Unit,
+    onToggleKeepScreenOn: () -> Unit,
     onStart: () -> Unit,
 ) {
     val totalMs = computeTotalMs(bundle)
