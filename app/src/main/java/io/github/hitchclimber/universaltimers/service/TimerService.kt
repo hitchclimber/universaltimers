@@ -12,6 +12,9 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import io.github.hitchclimber.universaltimers.MainActivity
 import io.github.hitchclimber.universaltimers.R
 import io.github.hitchclimber.universaltimers.data.StepType
@@ -65,9 +68,23 @@ class TimerService : Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var observerJob: Job? = null
 
+    /** True when the app's UI is visible to the user. */
+    private var appInForeground = false
+
+    private val lifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) {
+            appInForeground = true
+        }
+
+        override fun onStop(owner: LifecycleOwner) {
+            appInForeground = false
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels()
+        ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -97,6 +114,7 @@ class TimerService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(lifecycleObserver)
         observerJob?.cancel()
         serviceScope.cancel()
         super.onDestroy()
@@ -135,23 +153,29 @@ class TimerService : Service() {
     private fun startObserving() {
         observerJob?.cancel()
         observerJob = serviceScope.launch {
-            // Poll at ~1 s intervals to update the notification.
-            // We don't collect the StateFlow directly at 100 ms because
-            // notification updates that fast would be wasteful.
-            while (true) {
-                val state = TimerEngineHolder.state.value
+            var lastNotificationSec = -1L
+            TimerEngineHolder.state.collect { state ->
                 if (state.isFinished) {
-                    showCompletionNotification()
+                    if (!appInForeground) {
+                        showCompletionNotification()
+                    }
                     stopSelf()
-                    return@launch
+                    return@collect
                 }
-                if (!state.isRunning && !state.isPaused) {
-                    // Timer was stopped externally
+                if (!state.isRunning && !state.isPaused && !state.isCountingDown) {
                     stopSelf()
-                    return@launch
+                    return@collect
                 }
-                updateOngoingNotification(state)
-                delay(1_000)
+                if (!appInForeground) {
+                    // Throttle notification updates to once per second —
+                    // the StateFlow emits every 100 ms but updating the
+                    // notification that often is wasteful.
+                    val currentSec = state.remainingMs / 1000
+                    if (currentSec != lastNotificationSec) {
+                        lastNotificationSec = currentSec
+                        updateOngoingNotification(state)
+                    }
+                }
             }
         }
     }
