@@ -5,7 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [BundleEntity::class], version = 1)
+// TODO: Replace fallbackToDestructiveMigration with a proper Migration(1, 2)
+//  that ALTERs the bundles table to add the countdownEnabled column.
+@Database(entities = [BundleEntity::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun bundleDao(): BundleDao
 
@@ -19,7 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "timerbundle.db",
-                ).build().also { instance = it }
+                ).fallbackToDestructiveMigration().build().also { instance = it }
             }
     }
 }

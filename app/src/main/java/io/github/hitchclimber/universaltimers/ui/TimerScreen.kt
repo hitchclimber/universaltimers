@@ -1,7 +1,15 @@
 package io.github.hitchclimber.universaltimers.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +70,8 @@ import io.github.hitchclimber.universaltimers.timer.TimerState
 fun TimerScreen(
     bundle: TimerBundle,
     state: TimerState,
+    isSoundEnabled: Boolean,
+    onToggleSound: () -> Unit,
     onStart: () -> Unit,
     onPauseResume: () -> Unit,
     onStop: () -> Unit,
@@ -103,6 +113,8 @@ fun TimerScreen(
             ) {
                 if (state.isFinished) {
                     FinishedView(onReset = onStop)
+                } else if (state.isCountingDown) {
+                    CountdownView(value = state.countdownValue)
                 } else if (state.isRunning) {
                     RunningView(
                         state = state,
@@ -112,7 +124,12 @@ fun TimerScreen(
                         onStop = onStop,
                     )
                 } else {
-                    IdleView(bundle = bundle, onStart = onStart)
+                    IdleView(
+                        bundle = bundle,
+                        isSoundEnabled = isSoundEnabled,
+                        onToggleSound = onToggleSound,
+                        onStart = onStart,
+                    )
                 }
             }
 
@@ -136,7 +153,12 @@ fun TimerScreen(
 }
 
 @Composable
-private fun IdleView(bundle: TimerBundle, onStart: () -> Unit) {
+private fun IdleView(
+    bundle: TimerBundle,
+    isSoundEnabled: Boolean,
+    onToggleSound: () -> Unit,
+    onStart: () -> Unit,
+) {
     val totalMs = computeTotalMs(bundle)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -152,7 +174,23 @@ private fun IdleView(bundle: TimerBundle, onStart: () -> Unit) {
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.outline,
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Sound toggle
+        IconButton(onClick = onToggleSound) {
+            Icon(
+                painterResource(
+                    if (isSoundEnabled) R.drawable.ic_volume_on else R.drawable.ic_volume_off
+                ),
+                contentDescription = if (isSoundEnabled) "Sound on" else "Sound off",
+                tint = if (isSoundEnabled)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.outline,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         FilledIconButton(
             onClick = onStart,
@@ -307,6 +345,44 @@ private fun RunningView(
                 ),
                 contentDescription = if (state.isPaused) "Resume" else "Pause",
                 modifier = Modifier.size(32.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun CountdownView(value: Int) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .padding(horizontal = 48.dp),
+    ) {
+        AnimatedContent(
+            targetState = value,
+            transitionSpec = {
+                (scaleIn(
+                    initialScale = 0.4f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow,
+                    ),
+                ) + fadeIn(animationSpec = tween(200)))
+                    .togetherWith(
+                        scaleOut(
+                            targetScale = 1.6f,
+                            animationSpec = tween(250),
+                        ) + fadeOut(animationSpec = tween(200))
+                    )
+            },
+            label = "countdown-number",
+        ) { targetValue ->
+            Text(
+                text = "$targetValue",
+                fontSize = 120.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }

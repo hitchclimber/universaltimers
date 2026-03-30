@@ -66,6 +66,7 @@ fun EditBundleScreen(
     onBack: () -> Unit,
 ) {
     var name by remember { mutableStateOf(initial?.name ?: "") }
+    var countdownEnabled by remember { mutableStateOf(initial?.countdownEnabled ?: false) }
     var blocks by remember {
         mutableStateOf(
             initial?.blocks ?: listOf(
@@ -109,6 +110,27 @@ fun EditBundleScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Countdown toggle
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "3-second countdown",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+                Switch(
+                    checked = countdownEnabled,
+                    onCheckedChange = { countdownEnabled = it },
+                )
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -155,6 +177,7 @@ fun EditBundleScreen(
                             id = initial?.id ?: UUID.randomUUID().toString(),
                             name = name.ifBlank { "Untitled" },
                             blocks = blocks,
+                            countdownEnabled = countdownEnabled,
                         )
                     )
                 },
