@@ -286,7 +286,6 @@ private fun EditBlockCard(
             )
 
             DeltaWheel(
-                label = "Delta",
                 valueSec = (workStep.deltaMs / 1000).toInt(),
                 onValueChange = { sec ->
                     val newWork = workStep.copy(deltaMs = sec.toLong() * 1000)
@@ -333,7 +332,6 @@ private fun EditBlockCard(
                 )
 
                 DeltaWheel(
-                    label = "Delta",
                     valueSec = (restStep.deltaMs / 1000).toInt(),
                     onValueChange = { sec ->
                         val newRest = restStep.copy(deltaMs = sec.toLong() * 1000)
@@ -465,7 +463,6 @@ private fun LabeledSlider(
 
 @Composable
 private fun DeltaWheel(
-    label: String,
     valueSec: Int,
     onValueChange: (Int) -> Unit,
 ) {
@@ -476,7 +473,7 @@ private fun DeltaWheel(
             .padding(vertical = 4.dp),
     ) {
         Text(
-            text = label,
+            text = "Delta",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f),
