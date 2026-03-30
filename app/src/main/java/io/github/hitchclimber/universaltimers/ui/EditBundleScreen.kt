@@ -125,11 +125,6 @@ fun EditBundleScreen(
                         text = "3-second countdown",
                         style = MaterialTheme.typography.bodyLarge,
                     )
-                    Text(
-                        text = "Count down 3-2-1 before starting",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
                 Switch(
                     checked = countdownEnabled,
