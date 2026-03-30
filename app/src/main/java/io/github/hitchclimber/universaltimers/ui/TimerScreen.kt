@@ -193,18 +193,32 @@ private fun IdleView(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Sound toggle
-        IconButton(onClick = onToggleSound) {
-            Icon(
-                painterResource(
-                    if (isSoundEnabled) R.drawable.ic_volume_on else R.drawable.ic_volume_off
-                ),
-                contentDescription = if (isSoundEnabled) "Sound on" else "Sound off",
-                tint = if (isSoundEnabled)
-                    MaterialTheme.colorScheme.primary
-                else
-                    MaterialTheme.colorScheme.outline,
-            )
+        // Sound & screen-on toggles
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            IconButton(onClick = onToggleSound) {
+                Icon(
+                    painterResource(
+                        if (isSoundEnabled) R.drawable.ic_volume_on else R.drawable.ic_volume_off
+                    ),
+                    contentDescription = if (isSoundEnabled) "Sound on" else "Sound off",
+                    tint = if (isSoundEnabled)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.outline,
+                )
+            }
+            IconButton(onClick = onToggleKeepScreenOn) {
+                Icon(
+                    painterResource(
+                        if (isKeepScreenOn) R.drawable.ic_screen_on else R.drawable.ic_screen_off
+                    ),
+                    contentDescription = if (isKeepScreenOn) "Screen on" else "Screen off",
+                    tint = if (isKeepScreenOn)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.outline,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

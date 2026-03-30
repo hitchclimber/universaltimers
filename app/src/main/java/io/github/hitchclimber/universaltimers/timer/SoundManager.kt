@@ -29,11 +29,16 @@ class SoundManager {
         return toneGenerator
     }
 
-    /** Short beep when the timer starts. */
+    /** Sustained tone (~1.5 s) when the timer starts running after the countdown. */
     fun playStart(scope: CoroutineScope) {
         if (!enabled) return
         scope.launch(Dispatchers.Main) {
-            ensureGenerator()?.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+            val gen = ensureGenerator() ?: return@launch
+            // DTMF tones are continuous and respect startTone/stopTone,
+            // unlike TONE_PROP_* which are canned patterns.
+            gen.startTone(ToneGenerator.TONE_DTMF_S)
+            delay(1000)
+            gen.stopTone()
         }
     }
 
@@ -57,11 +62,11 @@ class SoundManager {
         }
     }
 
-    /** Short tick for countdown (future 3-second countdown feature). */
+    /** Short beep for each countdown number (3, 2, 1). */
     fun playCountdownTick(scope: CoroutineScope) {
         if (!enabled) return
         scope.launch(Dispatchers.Main) {
-            ensureGenerator()?.startTone(ToneGenerator.TONE_CDMA_PIP, 80)
+            ensureGenerator()?.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
         }
     }
 

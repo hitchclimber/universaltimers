@@ -21,10 +21,29 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     /** Tracks the previous step key so we can detect step transitions. */
     private var lastStepKey: Triple<Int, Int, Int>? = null
 
+    /** Tracks the last countdown value so we beep once per number. */
+    private var lastCountdownValue: Int = 0
+
+    /** Whether the previous state was counting down (to detect countdown → running transition). */
+    private var wasCountingDown: Boolean = false
+
     init {
-        // Observe state to play sounds on step transitions
+        // Observe state to play sounds on countdown ticks and step transitions
         viewModelScope.launch {
             state.collect { newState ->
+                // Countdown beeps: one short beep per number (3, 2, 1)
+                if (newState.isCountingDown && newState.countdownValue != lastCountdownValue) {
+                    lastCountdownValue = newState.countdownValue
+                    soundManager.playCountdownTick(viewModelScope)
+                }
+
+                // Long "go" beep when countdown ends and timer starts running
+                if (wasCountingDown && !newState.isCountingDown && newState.isRunning) {
+                    soundManager.playStart(viewModelScope)
+                }
+                wasCountingDown = newState.isCountingDown
+
+                // Step transition sounds
                 if (newState.isRunning && !newState.isFinished) {
                     val key = Triple(
                         newState.currentBlockIndex,
@@ -43,7 +62,9 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     fun startBundle(bundle: TimerBundle) {
         val context = getApplication<Application>()
         lastStepKey = null
-        soundManager.playStart(viewModelScope)
+        lastCountdownValue = 0
+        wasCountingDown = false
+
 
         TimerEngineHolder.start(
             scope = viewModelScope,
